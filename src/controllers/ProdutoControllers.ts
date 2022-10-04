@@ -4,33 +4,32 @@ import * as Yup from 'yup';
 
 // yarn add yup @types/yup
 const userSchema = Yup.object().shape({
-    name: Yup.string().required(),
-    email: Yup.string().email().required(),
-    username: Yup.string().required(),
-    phone: Yup.string().required(),
+    nome: Yup.string().required(),
+    descricao: Yup.string().required(),
+    quantidadeEstoque: Yup.string().required(),
+    preco: Yup.string().required(),
+    precoPromocional: Yup.string().required(),
+    precoPromoAtivado: Yup.string().required(),
+    tipo: Yup.string().required(),
 
-    address: Yup.object({
-        street: Yup.string().required(),
-        suite: Yup.string().required(),
-        city: Yup.string().required(),
-        zipcode: Yup.string().required(),
-    }),
 });
 const deleteUserSchema = Yup.object().shape({
-    email: Yup.string().email().required(),
+    nome: Yup.string().required(),
 });
 
 export default {
     async create(request: Request, response: Response) {
-        const { name, email, username, phone, address } = request.body;
+        const { nome, descricao, quantidadeEstoque, preco, precoPromocional, precoPromoAtivado, tipo } = request.body;
 
         if (
             !(await userSchema.isValid({
-                name,
-                email,
-                username,
-                phone,
-                address,
+                nome,
+                descricao,
+                quantidadeEstoque,
+                preco,
+                precoPromocional,
+                precoPromoAtivado,
+                tipo,
             }))
         ) {
             return response
@@ -38,14 +37,16 @@ export default {
                 .json({ message: 'dados fornecidos incorretamente' });
         }
 
-        const existing = await Produto.findOne({ email });
+        const existing = await Produto.findOne({ nome });
         if (!existing) {
             const user = await Produto.create({
-                name,
-                email,
-                username,
-                phone,
-                address,
+                nome,
+                descricao,
+                quantidadeEstoque,
+                preco,
+                precoPromocional,
+                precoPromoAtivado,
+                tipo,
             });
             return response.status(200).json({
                 message: 'Produto criado com sucesso',
@@ -69,15 +70,14 @@ export default {
         return response.status(200).json(existing);
     },
     async update(request: Request, response: Response) {
-        const { name, email, username } = request.body;
+        const { nome, tipo } = request.body;
 
         const user = await Produto.findOneAndUpdate(
             {
-                name,
+                nome,
             },
             {
-                email,
-                username,
+                tipo,
             }
         );
         if (user) {
@@ -86,9 +86,9 @@ export default {
         return response.status(400).json({ message: 'Produto nao encontrado' });
     },
     async findOne(request: Request, response: Response) {
-        const { name, email, username } = request.body;
+        const { nome, tipo } = request.body;
         const user = await Produto.find({
-            $or: [{ name: name }, { email: email }, { username: username }],
+            $or: [{ nome: nome }],
         });
         if (user) {
             return response.status(200).json(user);
@@ -96,12 +96,12 @@ export default {
         return response.status(400).json({ message: 'Produto nao encontrado' });
     },
     async delete(request: Request, response: Response) {
-        const { email } = request.body;
+        const { nome } = request.body;
 
-        if (!(await deleteUserSchema.isValid({ email }))) {
-            return response.status(401).json({ message: 'email invalido' });
+        if (!(await deleteUserSchema.isValid({ nome }))) {
+            return response.status(401).json({ message: 'nome invalido' });
         }
-        const result = await Produto.findOneAndDelete({ email });
+        const result = await Produto.findOneAndDelete({ nome });
         if (result) {
             return response
                 .status(200)
