@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import mongoose from 'mongoose';
-import userRoutes from './routes/users';
+import produtoRoutes from './routes/produtos';
 
 const PORT = process.env.PORT || 3000;
 
@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use(morgan('dev'));
-app.use(userRoutes);
+app.use(produtoRoutes);
 
 const mongoURI = process.env.MONGODB_URL || '';
 console.log('Conectando ao mongo');
