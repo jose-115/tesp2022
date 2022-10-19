@@ -13,8 +13,8 @@ const userSchema = Yup.object().shape({
     tipo: Yup.string().required(),
 
 });
-const deleteUserSchema = Yup.object().shape({
-    nome: Yup.string().required(),
+const deleteProdutoSchema = Yup.object().shape({
+    _id: Yup.string().required(),
 });
 
 export default {
@@ -86,22 +86,22 @@ export default {
         return response.status(400).json({ message: 'Produto nao encontrado' });
     },
     async findOne(request: Request, response: Response) {
-        const { nome, tipo } = request.body;
-        const user = await Produto.find({
-            $or: [{ nome: nome }],
+        const { _id } = request.params;
+        const produto = await Produto.find({
+            $or: [{ _id : _id }],
         });
-        if (user) {
-            return response.status(200).json(user);
+        if (produto) {
+            return response.status(200).json(produto);
         }
         return response.status(400).json({ message: 'Produto nao encontrado' });
     },
     async delete(request: Request, response: Response) {
-        const { nome } = request.body;
+        const { _id } = request.body;
 
-        if (!(await deleteUserSchema.isValid({ nome }))) {
-            return response.status(401).json({ message: 'nome invalido' });
+        if (!(await deleteProdutoSchema.isValid({ _id }))) {
+            return response.status(401).json({ message: 'id invalido' });
         }
-        const result = await Produto.findOneAndDelete({ nome });
+        const result = await Produto.findOneAndDelete({ _id });
         if (result) {
             return response
                 .status(200)
